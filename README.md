@@ -26,12 +26,14 @@ make -j$(nproc)
 We aim to integrate a wide range of **STT & TTS** providers into VoiceKit. Below is the roadmap:
 
 ### ✅ Initial Release (MVP)
-- [x] Basic STT support (Google, Microsoft, Amazon)
-- [x] Basic TTS support (Google, Microsoft, Amazon)
+- [x] Basic STT support (Microsoft)
+- [x] Basic TTS support (Microsoft)
 - [x] Streaming audio processing
 
 ### 🔜 Upcoming Integrations
-- [ ] **Deepgram STT**
+- [ ] **Google STT/TTS**
+- [ ] **Amazon Polly STT/TTS**
+- [ ] **Deepgram STT/TTS**
 - [ ] **ElevenLabs TTS**
 - [ ] **PlayHT TTS**
 - [ ] **IBM Watson STT & TTS**
