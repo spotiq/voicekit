@@ -44,7 +44,6 @@ void STTModuleBase::ProcessAudioStream() {
 
         try{
             if (taskType == "media") {
-                SPDLOG_INFO("Stream Audio. size={}",audioData.size());
                 ImplStreamAudioData(audioData);
             }else if (taskType == "start"){
                 SPDLOG_INFO("[{}] Start RecognizeSpeech.",stream_sid);
