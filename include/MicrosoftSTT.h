@@ -9,7 +9,7 @@ using namespace std;
 using namespace Microsoft::CognitiveServices::Speech;
 using namespace Microsoft::CognitiveServices::Speech::Audio;
 
-class MicrosoftSTT : public STTModuleBase {
+class MicrosoftSTT : public STTModuleBase, public std::enable_shared_from_this<MicrosoftSTT> {
 public:
     using STTModuleBase::STTModuleBase;
     void InitialiseSTTModule(const std::string& subscriptionKey, const std::string& region) override;

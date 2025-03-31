@@ -44,6 +44,7 @@ void STTModuleBase::ProcessAudioStream() {
 
         try{
             if (taskType == "media") {
+                SPDLOG_INFO("Stream Audio. size={}",audioData.size());
                 ImplStreamAudioData(audioData);
             }else if (taskType == "start"){
                 SPDLOG_INFO("[{}] Start RecognizeSpeech.",stream_sid);
@@ -53,7 +54,7 @@ void STTModuleBase::ProcessAudioStream() {
                 ImplStopRecognition();
             }
         } catch (const std::exception &e) {
-            SPDLOG_ERROR( "ASRModule error {}" , e.what() );
+            SPDLOG_ERROR( "{}" , e.what() );
         }
     }
 }

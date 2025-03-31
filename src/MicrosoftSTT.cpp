@@ -1,6 +1,9 @@
 #include "MicrosoftSTT.h"
 
+
 void MicrosoftSTT::InitialiseSTTModule(const std::string& subscriptionKey, const std::string& region) {
+    std::shared_ptr<MicrosoftSTT> self = shared_from_this();  // ✅ Now safe to use
+
     speechConfig = SpeechConfig::FromSubscription(subscriptionKey, region);
     auto audioFormat = AudioStreamFormat::GetWaveFormatPCM(8000, 16, 1);
     pushStream = AudioInputStream::CreatePushStream(audioFormat);
@@ -12,6 +15,7 @@ void MicrosoftSTT::InitialiseSTTModule(const std::string& subscriptionKey, const
 
     recognizer = SpeechRecognizer::FromConfig(speechConfig, audioConfig);
     speechConfig->SetSpeechRecognitionLanguage(language);
+    ImplRecognize();
 }
 
 void MicrosoftSTT::ImplStreamAudioData(std::vector<uint8_t> audioData)  {
@@ -22,13 +26,13 @@ void MicrosoftSTT::ImplStreamAudioData(std::vector<uint8_t> audioData)  {
 
 void MicrosoftSTT::ImplStartRecognition() {
     if (recognizer){
-        recognizer->StopContinuousRecognitionAsync().get();
+        recognizer->StartContinuousRecognitionAsync().get();
     }
 }
 
 void MicrosoftSTT::ImplStopRecognition() {
     if (recognizer){
-        recognizer->StartContinuousRecognitionAsync().get();
+        recognizer->StopContinuousRecognitionAsync().get();
     }
 }
 
@@ -39,7 +43,7 @@ void MicrosoftSTT::ImplRecognize() {
         // Intermediate result (hypothesis).
         if (e.Result->Reason == ResultReason::RecognizingSpeech)
         {
-            SPDLOG_INFO("[{}] Recognizing: {}",stream_sid, e.Result->Text);
+            SPDLOG_INFO("Recognizing: {}", e.Result->Text);
         }
         else if (e.Result->Reason == ResultReason::RecognizingKeyword)
         {
@@ -57,7 +61,7 @@ void MicrosoftSTT::ImplRecognize() {
         else if (e.Result->Reason == ResultReason::RecognizedSpeech)
         {
             // Final result. May differ from the last intermediate result.
-            // SPDLOG_INFO("RECOGNIZED: Text= {}", e.Result->Text);
+            SPDLOG_INFO("RECOGNIZED: Text= {}", e.Result->Text);
             std::string str_copy = e.Result->Text;
             RecognisedText(str_copy);
         }
