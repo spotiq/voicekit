@@ -15,9 +15,10 @@ void TestMicrosoftSTT() {
         return;
     }
 
-    auto stt = STTFactory::CreateSTTModule("Microsoft", "test_session", [](std::string& text) {
+    std::shared_ptr<I_STTModule> stt = STTFactory::CreateSTTModule("Microsoft", "test_session", [&](std::string& text) {
         assert(!text.empty());
         std::cout << "Test Recognized: " << text << "\n";
+        stt->StopRecognition();
     }, "en-US");
 
     std::cout << "InitialiseSTTModule" << "\n";
@@ -49,9 +50,7 @@ void TestMicrosoftSTT() {
         stt->StreamAudioData(buffer);
     }
 
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-    stt->StopRecognition();
-    std::this_thread::sleep_for(std::chrono::seconds(10));
+    std::this_thread::sleep_for(std::chrono::seconds(20));
 }
 
 int main() {
