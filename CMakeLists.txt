@@ -9,8 +9,22 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# Set paths
+set(SPEECHSDK_ROOT "/usr/local/speechsdk")
+
 # Include directory for headers
-include_directories(include)
+include_directories(
+    include
+    /usr/include
+    ${SPEECHSDK_ROOT}/include/cxx_api
+    ${SPEECHSDK_ROOT}/include/c_api
+)
+
+# Library directories
+link_directories(
+    /usr/local/lib
+    ${SPEECHSDK_ROOT}/lib/x64
+)
 
 # Add library sources
 set(STT_SOURCES
@@ -23,7 +37,11 @@ set(STT_SOURCES
 add_library(stt STATIC ${STT_SOURCES})
 
 # Link pthread to support threading
-target_link_libraries(stt PRIVATE pthread)
+target_link_libraries(stt
+    PRIVATE 
+    pthread
+    Microsoft.CognitiveServices.Speech.core
+)
 
 # Enable testing
 enable_testing()
