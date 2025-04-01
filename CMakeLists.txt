@@ -31,6 +31,10 @@ set(STT_SOURCES
     src/STTFactory.cpp
     src/STTModuleBase.cpp
     src/MicrosoftSTT.cpp
+    src/TTSFactory.cpp
+    src/TTSModuleBase.cpp
+    src/MicrosoftTTS.cpp
+    src/TTSCache.cpp
 )
 
 # Create a static library
