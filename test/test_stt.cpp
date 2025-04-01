@@ -1,4 +1,5 @@
 #include "STTFactory.h"
+#include "TTSFactory.h"
 #include <iostream>
 #include <cassert>
 #include <fstream>
@@ -6,6 +7,33 @@
 #include <cstdlib>
 #include <thread>
 #include <chrono>
+
+void TestMicrosoftTTS() {
+    const char* key = std::getenv("SPEECH_KEY");
+    const char* region = std::getenv("SPEECH_REGION");
+    if (!key || !region) {
+        std::cerr << "Environment variables MICROSOFT_STT_KEY and MICROSOFT_STT_REGION must be set.\n";
+        return;
+    }
+
+    std::shared_ptr<I_TTSModule> tts = TTSFactory::CreateTTSModule("Microsoft", "test_session", [&](const std::vector<uint8_t>& audioData) {
+        std::cout << "Audio data size : " << audioData.size() << "\n";
+        if (audioData.size()==0){
+            std::cout << "Audio data empty : " << audioData.size() << "\n";
+        }
+    }, "en-US-AvaMultilingualNeural");
+
+    std::cout << "InitialiseSTTModule" << "\n";
+
+    tts->Initialise(key, region);
+
+    std::cout << "StartRecognition" << "\n";
+
+    tts->Speak("Hi How are you? Hello World!!");
+    
+    std::this_thread::sleep_for(std::chrono::seconds(20));
+}
+
 
 void TestMicrosoftSTT() {
     const char* key = std::getenv("SPEECH_KEY");
@@ -54,7 +82,8 @@ void TestMicrosoftSTT() {
 }
 
 int main() {
-    TestMicrosoftSTT();
+    // TestMicrosoftSTT();
+    TestMicrosoftTTS();
     std::cout << "All tests passed!\n";
     return 0;
 }

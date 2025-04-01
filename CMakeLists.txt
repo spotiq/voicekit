@@ -45,6 +45,7 @@ target_link_libraries(stt
     PRIVATE 
     pthread
     Microsoft.CognitiveServices.Speech.core
+    crypto
 )
 
 # Enable testing
