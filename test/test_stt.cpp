@@ -16,20 +16,26 @@ void TestMicrosoftTTS() {
         return;
     }
 
+    std::ofstream outFile("8KHz16BitMonoRAWGeneratedAudio.raw", std::ios::binary);
+    if (!outFile) {
+        std::cerr << "Failed to open file for writing." << "\n";
+        return;
+    }
+
     std::shared_ptr<I_TTSModule> tts = TTSFactory::CreateTTSModule("Microsoft", "test_session", [&](const std::vector<uint8_t>& audioData) {
         std::cout << "Audio data size : " << audioData.size() << "\n";
-        if (audioData.size()==0){
-            std::cout << "Audio data empty : " << audioData.size() << "\n";
+        if (audioData.empty()) {
+            std::cout << "Audio data is empty." << "\n";
+            outFile.close();
+        } else {
+            outFile.write(reinterpret_cast<const char*>(audioData.data()), audioData.size());
+            std::cout << "Audio data written to 8KHz16BitMonoRAWGeneratedAudio.raw" << "\n";
         }
     }, "en-US-AvaMultilingualNeural");
 
-    std::cout << "InitialiseSTTModule" << "\n";
-
     tts->Initialise(key, region);
 
-    std::cout << "StartRecognition" << "\n";
-
-    tts->Speak("Hi How are you? Hello World!!");
+    tts->Speak("Hi How are you? Hello World!");
     
     std::this_thread::sleep_for(std::chrono::seconds(20));
 }

@@ -144,7 +144,7 @@ void TTSModuleBase::SynthesisedAudioData(std::vector<uint8_t> audioData,std::str
 void TTSModuleBase::Speak(const std::string& text) {
     {
         std::lock_guard<std::mutex> lock(queueMutex);
-        textQueue.push({text, "start"});
+        textQueue.push({"start",text});
     }
     queueCV.notify_one();
 }
@@ -153,7 +153,7 @@ void TTSModuleBase::Speak(const std::string& text) {
 void TTSModuleBase::StopSpeak() {
     {
         std::lock_guard<std::mutex> lock(queueMutex);
-        textQueue.push({"", "stop"});
+        textQueue.push({"stop",""});
     }
     queueCV.notify_one();
 }
