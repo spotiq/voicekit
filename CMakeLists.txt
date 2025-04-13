@@ -35,6 +35,7 @@ set(STT_SOURCES
     src/TTSModuleBase.cpp
     src/MicrosoftTTS.cpp
     src/TTSCache.cpp
+    src/DeepgramSTT.cpp
 )
 
 # Create a static library
@@ -46,6 +47,9 @@ target_link_libraries(stt
     pthread
     Microsoft.CognitiveServices.Speech.core
     crypto
+    /usr/local/lib/libixwebsocket.a
+    z
+    ssl
 )
 
 # Enable testing
