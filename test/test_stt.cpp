@@ -41,6 +41,38 @@ void TestMicrosoftTTS() {
 }
 
 
+void TestDeepgramTTS() {
+    const char* key = std::getenv("DEEPGRAM_SPEECH_KEY");
+    const char* region = std::getenv("SPEECH_REGION");
+    if (!key || !region) {
+        std::cerr << "Environment variables MICROSOFT_STT_KEY and MICROSOFT_STT_REGION must be set.\n";
+        return;
+    }
+
+    std::ofstream outFile("8KHz16BitMonoRAWGeneratedAudio.raw", std::ios::binary);
+    if (!outFile) {
+        std::cerr << "Failed to open file for writing." << "\n";
+        return;
+    }
+
+    std::shared_ptr<I_TTSModule> tts = TTSFactory::CreateTTSModule("Deepgram", "test_session", [&](const std::vector<uint8_t>& audioData) {
+        std::cout << "Audio data size : " << audioData.size() << "\n";
+        if (audioData.empty()) {
+            std::cout << "Audio data is empty." << "\n";
+            outFile.close();
+        } else {
+            outFile.write(reinterpret_cast<const char*>(audioData.data()), audioData.size());
+            std::cout << "Audio data written to 8KHz16BitMonoRAWGeneratedAudio.raw" << "\n";
+        }
+    }, "aura-asteria-en");
+
+    tts->Initialise(key, region);
+
+    tts->Speak("Hi! How are you? What is plan for this weekend? Do you want to go outside somewhere near by to bangalore?");
+    
+    std::this_thread::sleep_for(std::chrono::seconds(20));
+}
+
 
 void TestDeepgramSTT() {
     const char* key = std::getenv("DEEPGRAM_SPEECH_KEY");
@@ -89,7 +121,6 @@ void TestDeepgramSTT() {
 
     std::this_thread::sleep_for(std::chrono::seconds(20));
 }
-
 
 void TestMicrosoftSTT() {
     const char* key = std::getenv("SPEECH_KEY");
@@ -140,7 +171,8 @@ void TestMicrosoftSTT() {
 int main() {
     // TestMicrosoftSTT();
     // TestMicrosoftTTS();
-    TestDeepgramSTT();
+    // TestDeepgramSTT();
+    TestDeepgramTTS();
     std::cout << "All tests passed!\n";
     return 0;
 }

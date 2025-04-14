@@ -82,7 +82,7 @@ void TTSModuleBase::ProcessText() {
                 while (!textQueue.empty()) {
                     textQueue.pop();
                 }
-                SPDLOG_INFO("[{}] Stopping recognise thread.",stream_sid);
+                SPDLOG_INFO("[{}] Stopping synthesis thread.",stream_sid);
                 return; // Exit thread
             }
             

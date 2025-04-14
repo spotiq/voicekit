@@ -36,6 +36,7 @@ set(STT_SOURCES
     src/MicrosoftTTS.cpp
     src/TTSCache.cpp
     src/DeepgramSTT.cpp
+    src/DeepgramTTS.cpp
 )
 
 # Create a static library
