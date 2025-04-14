@@ -37,6 +37,7 @@ set(STT_SOURCES
     src/TTSCache.cpp
     src/DeepgramSTT.cpp
     src/DeepgramTTS.cpp
+    src/ElevenlabsTTS.cpp
 )
 
 # Create a static library
@@ -51,6 +52,7 @@ target_link_libraries(stt
     /usr/local/lib/libixwebsocket.a
     z
     ssl
+    cpr
 )
 
 # Enable testing
