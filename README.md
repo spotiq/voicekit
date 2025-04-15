@@ -17,7 +17,26 @@ git clone https://github.com/SpeechBrainHub/VoiceKit.git
 cd VoiceKit
 
 # Build (CMake Example)
-mkdir build && cd build
+Install vcpkg from https://github.com/microsoft/vcpkg to /usr/local/src/vcpkg.
+
+git clone https://github.com/microsoft/vcpkg.git /usr/local/src/vcpkg
+cd /usr/local/src/vcpkg
+./bootstrap-vcpkg.sh
+
+echo 'export PATH=$PATH:/usr/local/src/vcpkg' >> ~/.bashrc
+source ~/.bashrc
+
+# Install Google Cloud Speech SDK and dependencies
+./vcpkg/vcpkg install google-cloud-cpp[speech] --triplet x64-linux
+
+# Install Protobuf (needed for gRPC and Google SDK)
+./vcpkg/vcpkg install protobuf --triplet x64-linux
+
+# Install gRPC (C++ library)
+./vcpkg/vcpkg install grpc --triplet x64-linux
+
+root@monitoring:/home/azureuser/voicekit# cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/usr/local/src/vcpkg/scripts/buildsystems/vcpkg.cmake
+cd build
 cmake ..
 make -j$(nproc)
 ```

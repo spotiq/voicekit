@@ -10,6 +10,14 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# Include pkg-config support
+find_package(PkgConfig REQUIRED)
+
+# Let pkg-config look in the vcpkg pkgconfig path
+set(ENV{PKG_CONFIG_PATH} "/usr/local/src/vcpkg/installed/x64-linux/lib/pkgconfig")
+
+find_package(google_cloud_cpp_speech REQUIRED)
+
 # Set paths
 set(SPEECHSDK_ROOT "/usr/local/speechsdk")
 
@@ -37,6 +45,15 @@ link_directories(
     /usr/local/src/vcpkg/installed/x64-linux/lib
     ${SPEECHSDK_ROOT}/lib/x64
 )
+
+# find_package(google_cloud_cpp_speech REQUIRED)
+
+# # MSVC requires some additional code to select the correct runtime library
+# if (VCPKG_TARGET_TRIPLET MATCHES "-static$")
+#     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+# else ()
+#     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+# endif ()
 
 # Add library sources
 set(STT_SOURCES
@@ -67,6 +84,7 @@ target_link_libraries(stt
     ssl
     cpr
     dl
+    google-cloud-cpp::speech 
 )
 
 # Enable testing

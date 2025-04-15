@@ -1,5 +1,7 @@
 #pragma once
 
+#include "STTModuleBase.h"
+
 #include <google/cloud/speech/v2/speech_client.h>
 #include <google/cloud/speech/v2/speech_connection.h>
 #include <google/cloud/speech/v2/cloud_speech.pb.h>
@@ -15,21 +17,20 @@
 
 namespace speech = ::google::cloud::speech_v2;
 
-class GoogleSTT {
+class GoogleSTT : public STTModuleBase {
 public:
-    GoogleSTT(const std::string& sid, std::function<void(std::string&)> cb, const std::string& lang);
+    using STTModuleBase::STTModuleBase;
 
-    void InitialiseSTTModule(const std::string& projectId, const std::string& regionId);
-    void ImplStartRecognition();
-    void ImplStreamAudioData(std::vector<uint8_t> audioData);
-    void ImplStopRecognition();
-
+    void InitialiseSTTModule(const std::string& projectId, const std::string& regionId) override;
+    void ImplStartRecognition() override;
+    void ImplStreamAudioData(std::vector<uint8_t> audioData) override;
+    void ImplStopRecognition() override;
+    void ImplRecognize() override;
 private:
     void ConfigureStreamRequest(google::cloud::speech::v2::StreamingRecognizeRequest& request);
 
     std::string session_id;
     std::function<void(std::string&)> callback;
-    std::string language;
     std::string project;
     std::string region;
 

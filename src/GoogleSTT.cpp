@@ -2,10 +2,6 @@
 #include <iostream>
 #include <thread>
 
-
-GoogleSTT::GoogleSTT(const std::string& sid, std::function<void(std::string&)> cb, const std::string& lang)
-    : session_id(sid), callback(cb), language(lang) {}
-
 void GoogleSTT::InitialiseSTTModule(const std::string& projectId, const std::string& regionId) {
     project = projectId;
     region = regionId;
@@ -80,6 +76,11 @@ void GoogleSTT::ImplStreamAudioData(std::vector<uint8_t> audioData) {
     audio_request.mutable_audio()->append(reinterpret_cast<const char*>(audioData.data()), audioData.size());
     m_stream->Write(audio_request, grpc::WriteOptions{});
 }
+
+void GoogleSTT::ImplRecognize() {
+    
+}
+
 
 void GoogleSTT::ImplStopRecognition() {
     if (is_streaming && m_stream) {
