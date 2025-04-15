@@ -16,6 +16,7 @@ set(SPEECHSDK_ROOT "/usr/local/speechsdk")
 include_directories(
     include
     /usr/include
+    /usr/local/src/vcpkg/installed/x64-linux/include
     ${SPEECHSDK_ROOT}/include/cxx_api
     ${SPEECHSDK_ROOT}/include/c_api
 )
@@ -23,6 +24,7 @@ include_directories(
 # Library directories
 link_directories(
     /usr/local/lib
+    /usr/local/src/vcpkg/installed/x64-linux/lib
     ${SPEECHSDK_ROOT}/lib/x64
 )
 
@@ -38,6 +40,7 @@ set(STT_SOURCES
     src/DeepgramSTT.cpp
     src/DeepgramTTS.cpp
     src/ElevenlabsTTS.cpp
+    src/GoogleSTT.cpp
 )
 
 # Create a static library
@@ -53,6 +56,7 @@ target_link_libraries(stt
     z
     ssl
     cpr
+    dl
 )
 
 # Enable testing
