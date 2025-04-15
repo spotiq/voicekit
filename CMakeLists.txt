@@ -33,16 +33,12 @@ FetchContent_MakeAvailable(ixwebsocket)
 # Include directory for headers
 include_directories(
     include
-    /usr/include
-    /usr/local/src/vcpkg/installed/x64-linux/include
     ${SPEECHSDK_ROOT}/include/cxx_api
     ${SPEECHSDK_ROOT}/include/c_api
 )
 
 # Library directories
 link_directories(
-    /usr/local/lib
-    /usr/local/src/vcpkg/installed/x64-linux/lib
     ${SPEECHSDK_ROOT}/lib/x64
 )
 
