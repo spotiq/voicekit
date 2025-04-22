@@ -21,6 +21,20 @@ find_package(google_cloud_cpp_speech REQUIRED)
 # Set paths
 set(SPEECHSDK_ROOT "/usr/local/speechsdk")
 
+# === Download and build cpr ===
+
+# Enable SSL support in CPR
+set(CPR_ENABLE_SSL ON CACHE BOOL "Enable SSL for CPR")
+set(CPR_FORCE_USE_SYSTEM_CURL ON CACHE BOOL "Use system-installed libcurl")
+
+FetchContent_Declare(
+  cpr
+  GIT_REPOSITORY https://github.com/libcpr/cpr.git
+  GIT_TAG master
+)
+
+FetchContent_MakeAvailable(cpr)
+
 # === Download and build IXWebSocket ===
 FetchContent_Declare(
   ixwebsocket
