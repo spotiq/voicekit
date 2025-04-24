@@ -27,7 +27,7 @@ jobs:
 
     - name: Install Microsoft Speech SDK
       run: |
-        export SPEECHSDK_ROOT="$HOME/speechsdk"
+        export SPEECHSDK_ROOT="/usr/local/speechsdk"
         mkdir -p "$SPEECHSDK_ROOT"
         wget -O SpeechSDK-Linux.tar.gz https://aka.ms/csspeech/linuxbinary
         tar --strip 1 -xzf SpeechSDK-Linux.tar.gz -C "$SPEECHSDK_ROOT"
