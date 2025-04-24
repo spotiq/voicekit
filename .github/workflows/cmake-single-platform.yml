@@ -23,7 +23,14 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Install spdlog
-      run: sudo apt-get update && sudo apt-get install -y libspdlog-dev
+      run: sudo apt-get update && sudo apt-get install -y libspdlog-dev && sudo apt-get install build-essential ca-certificates libasound2-dev libssl-dev wget
+
+    - name: Install Microsoft Speech SDK
+      run: |
+        export SPEECHSDK_ROOT="$HOME/speechsdk"
+        mkdir -p "$SPEECHSDK_ROOT"
+        wget -O SpeechSDK-Linux.tar.gz https://aka.ms/csspeech/linuxbinary
+        tar --strip 1 -xzf SpeechSDK-Linux.tar.gz -C "$SPEECHSDK_ROOT"
       
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
