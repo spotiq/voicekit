@@ -10,7 +10,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Set paths
-set(SPEECHSDK_ROOT "/usr/local/speechsdk")
+set(SPEECHSDK_ROOT "$HOME/speechsdk")
 
 # Include directory for headers
 include_directories(
