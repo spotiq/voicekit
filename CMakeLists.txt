@@ -13,6 +13,16 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Set paths
 set(SPEECHSDK_ROOT "$ENV{HOME}/speechsdk")
 
+# === Download and build fmt ===
+
+FetchContent_Declare(
+  fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+  GIT_TAG 9.1.0
+)
+
+FetchContent_MakeAvailable(fmt)
+
 # === Download and build cpr ===
 
 # Enable SSL support in CPR
@@ -77,6 +87,7 @@ target_link_libraries(stt
     z
     ssl
     cpr
+    fmt
 )
 
 # Enable testing
