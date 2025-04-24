@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <functional>
-
+#include <cstdint>
 
 struct STTConfig {
     std::string vendor;         // E.g., "Azure", "Google", "AWS"
