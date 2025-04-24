@@ -23,7 +23,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Install spdlog
-      run: sudo apt-get update && sudo apt-get install -y libspdlog-dev && sudo apt-get install build-essential ca-certificates libasound2-dev libssl-dev wget
+      run: sudo apt-get update && sudo apt-get install -y libspdlog-dev libcurl4-openssl-dev && sudo apt-get install build-essential ca-certificates libasound2-dev libssl-dev wget
 
     - name: Install Microsoft Speech SDK
       run: |
