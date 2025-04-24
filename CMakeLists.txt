@@ -73,7 +73,7 @@ target_link_libraries(stt
     pthread
     Microsoft.CognitiveServices.Speech.core
     crypto
-    /usr/local/lib/libixwebsocket.a
+    ixwebsocket
     z
     ssl
     cpr
