@@ -169,12 +169,6 @@ void TestMicrosoftSTT() {
 }
 
 void TestGoogleSTT() {
-    const char* key = std::getenv("SPEECH_KEY");
-    const char* region = std::getenv("SPEECH_REGION");
-    if (!key || !region) {
-        std::cerr << "Environment variables MICROSOFT_STT_KEY and MICROSOFT_STT_REGION must be set.\n";
-        return;
-    }
 
     std::shared_ptr<I_STTModule> stt = STTFactory::CreateSTTModule("Google", "test_session", [&](std::string& text) {
         assert(!text.empty());
@@ -184,7 +178,8 @@ void TestGoogleSTT() {
 
     std::cout << "InitialiseSTTModule" << "\n";
 
-    stt->InitialiseSTTModule(key, region);
+    // Google ProjectID for STT , Region
+    stt->InitialiseSTTModule("814354973424", "asia-south1");
 
     std::cout << "StartRecognition" << "\n";
 

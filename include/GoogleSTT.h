@@ -10,6 +10,7 @@
 #include <google/cloud/experimental_tag.h>
 #include <google/cloud/status_or.h>
 #include <google/cloud/status.h> // Make sure to include the Status header
+#include <google/cloud/common_options.h>
 
 #include <memory>
 #include <string>
@@ -33,11 +34,12 @@ private:
 
     std::string session_id;
     std::function<void(std::string&)> callback;
-    std::string project;
-    std::string region;
+    std::string m_projectId;
+    std::string m_region;
 
-    std::unique_ptr<speech::SpeechClient> client;
-    std::shared_ptr<speech::SpeechConnection> connection;
+    std::unique_ptr<speech::SpeechClient> m_client;
+    std::atomic<bool> m_finished{false};
+    std::thread m_reader;
 
     std::unique_ptr<google::cloud::AsyncStreamingReadWriteRpc<
         google::cloud::speech::v2::StreamingRecognizeRequest,

@@ -3,34 +3,47 @@
 #include <thread>
 
 void GoogleSTT::InitialiseSTTModule(const std::string& projectId, const std::string& regionId) {
-    project = projectId;
-    region = regionId;
-    connection = speech::MakeSpeechConnection();
-    client = std::make_unique<speech::SpeechClient>(connection);
+    m_projectId = projectId;
+    // Construct the endpoint for asia-south1 (Bengaluru) for Speech V2.
+    std::string endpoint = regionId + "-speech.googleapis.com";
+
+    // Create options and set the endpoint.
+    google::cloud::Options options;
+    options.set<google::cloud::EndpointOption>(endpoint);
+
+    // Create the SpeechClient (uses GOOGLE_APPLICATION_CREDENTIALS)
+    m_client = std::make_unique<speech::SpeechClient>(speech::MakeSpeechConnection(options));
 }
 
-void GoogleSTT::ConfigureStreamRequest(google::cloud::speech::v2::StreamingRecognizeRequest& request) {
-    auto* streaming_config = request.mutable_streaming_config();
-    auto* recognition_config = streaming_config->mutable_config();
-    // auto* explicit_decoding_config = recognition_config->mutable_explicit_decoding_config();
+void GoogleSTT::ConfigureStreamRequest(google::cloud::speech::v2::StreamingRecognizeRequest& config_req) {
+    auto* cfg = config_req.mutable_streaming_config()->mutable_config();
+    auto* explicit_decoding_config = cfg->mutable_explicit_decoding_config();
 
-    recognition_config->add_language_codes(language);
-    recognition_config->set_model("latest_long");
-    // explicit_decoding_config->set_encoding(google::cloud::speech::v2::ExplicitDecodingConfig_AudioEncoding::ExplicitDecodingConfig_AudioEncoding_LINEAR16);
-    // explicit_decoding_config->set_sample_rate_hertz(8000);
-    // When using explicit decoding, you should ensure auto_decoding is not enabled.
-    // recognition_config->clear_auto_decoding_config();
-    // config_mask is automatically populated.
-    *recognition_config->mutable_auto_decoding_config() = google::cloud::speech::v2::AutoDetectDecodingConfig();
+    std::string recognizer = "projects/" + m_projectId + "/locations/global/recognizers/_";
+    
+    config_req.mutable_recognizer()->append(recognizer);
+
+    cfg->add_language_codes(language);
+    cfg->set_model("latest_long");                     
+
+    auto* streaming_cfg = config_req.mutable_streaming_config();
+    streaming_cfg->mutable_streaming_features()->enable_voice_activity_events();
+    streaming_cfg->mutable_streaming_features()->set_interim_results(true);
+
+    explicit_decoding_config->set_encoding(google::cloud::speech::v2::ExplicitDecodingConfig_AudioEncoding::ExplicitDecodingConfig_AudioEncoding_LINEAR16);
+    explicit_decoding_config->set_sample_rate_hertz(8000);
+    explicit_decoding_config->set_audio_channel_count(1);
+
+    cfg->features().enable_automatic_punctuation();
 }
 
 void GoogleSTT::ImplStartRecognition() {
-    if (!client) {
+    if (!m_client) {
         std::cerr << "Error: STT client not initialized.\n";
         return;
     }
 
-    m_stream = client->AsyncStreamingRecognize();
+    m_stream = m_client->AsyncStreamingRecognize();
     if (!m_stream) {
         std::cerr << "Error: Failed to create streaming recognize stream.\n";
         return;
@@ -59,34 +72,32 @@ void GoogleSTT::ImplStartRecognition() {
 
         is_streaming = true;
 
-        // Read responses in a separate thread to avoid blocking the main flow.
-        std::thread response_thread([this] {
-            auto read = [this] { return m_stream->Read().get(); };
-            while (is_streaming) {
-                auto response = read();
-                if (response.has_value()) {
-                    // Process the response
-                    for (auto const& result : response->results()) {
-                        std::cout << "Result stability: " << result.stability() << "\n";
-                        for (auto const& alternative : result.alternatives()) {
-                            std::cout << alternative.confidence() << "\t"
-                                      << alternative.transcript() << "\n";
+        m_reader = std::thread([this] {
+            while (true) {
+                auto resp = m_stream->Read().get();
+                if (!resp.has_value()) break;  // stream closed
+
+                for (auto const& result : resp->results()) {
+                    if (result.is_final()){
+                        std::cout << "[Final] ";
+                        for (auto const& alt : result.alternatives()) {
+                            std::string text = alt.transcript();  // Copy into a non-const std::string
+                            RecognisedText(text);
+                            std::cout << text << std::endl;
                         }
+                    }else{
+                        std::cout << "[Interim] ";
                     }
-                } else {
-                    // Stream ended or an error occurred during read.
-                    // We should try to get the final status.
-                    google::cloud::Status finish_status = m_stream->Finish().get();
-                    if (!finish_status.ok()) {
-                        std::cerr << "Error reading responses: " << finish_status.message() << "\n";
-                        // Consider setting an error flag in your class.
-                    }
-                    break; // Exit the loop
                 }
             }
+            // Get final status
+            auto status = m_stream->Finish().get();
+            if (!status.ok()) {
+                std::cerr << "Stream finished with error: "
+                        << status.code() << ": " << status.message() << "\n";
+            }
+            m_finished = true;
         });
-        response_thread.detach(); // Allow the thread to run independently.
-
     } catch (const std::runtime_error& e) {
         std::cerr << "Error during recognition: " << e.what() << "\n";
         if (m_stream) {
@@ -98,20 +109,20 @@ void GoogleSTT::ImplStartRecognition() {
     }
 }
 
+void GoogleSTT::ImplRecognize() {
+    
+}
+
 void GoogleSTT::ImplStreamAudioData(std::vector<uint8_t> audioData) {
     if (!is_streaming || !m_stream) return;
 
     if (audioData.empty()) return; // Don't send empty chunks
 
-    google::cloud::speech::v2::StreamingRecognizeRequest audio_request;
-    audio_request.mutable_audio()->append(reinterpret_cast<const char*>(audioData.data()), audioData.size());
-    if (!m_stream->Write(audio_request, grpc::WriteOptions{}).get()) {
-        std::cerr << "Failed to write audio chunk to stream. : " << std::endl;
+    google::cloud::speech::v2::StreamingRecognizeRequest audio_req;
+    audio_req.mutable_audio()->append(reinterpret_cast<const char*>(audioData.data()), audioData.size());
+    if (!m_stream->Write(audio_req, grpc::WriteOptions{}).get()) {
+        std::cerr << "Failed to write audio chunk\n";
     }
-}
-
-void GoogleSTT::ImplRecognize() {
-    
 }
 
 void GoogleSTT::ImplStopRecognition() {
@@ -121,14 +132,16 @@ void GoogleSTT::ImplStopRecognition() {
             std::cerr << "Failed to signal writes done.\n";
             // We don't have a detailed status here, just a boolean.
         }
-
-        google::cloud::Status finish_status = m_stream->Finish().get();
-        if (!finish_status.ok()) {
-            std::cerr << "Stream finished with error: " << finish_status.code()
-                      << ", " << finish_status.message() << "\n";
-            // Handle the error appropriately.
+        m_reader.join();
+        if (!m_finished) {
+            // If the reader thread didn’t see Finish(), ensure we call it
+            google::cloud::Status finish_status = m_stream->Finish().get();
+            if (!finish_status.ok()) {
+                std::cerr << "Stream finished with error: " << finish_status.code()
+                        << ", " << finish_status.message() << "\n";
+                // Handle the error appropriately.
+            }
         }
-
         is_streaming = false;
         m_stream.reset(); // Release the stream object.
     }
