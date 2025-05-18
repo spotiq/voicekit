@@ -40,16 +40,24 @@ int main(int argc, char* argv[]) {
         auto* cfg = config_req.mutable_streaming_config()->mutable_config();
         auto* explicit_decoding_config = cfg->mutable_explicit_decoding_config();
 
+        
         config_req.mutable_recognizer()->append("projects/814354973424/locations/global/recognizers/_");
 
         cfg->add_language_codes("hi-IN");                       // Hindi
         cfg->set_model("latest_long");                          // long-form model
+
+      auto* streaming_cfg = config_req.mutable_streaming_config();
+      streaming_cfg->mutable_streaming_features()->enable_voice_activity_events();
+      streaming_cfg->mutable_streaming_features()->set_interim_results(true);         // ✅ Set here
+
         // *cfg->mutable_auto_decoding_config() =               // auto-detect PCM
         //     google::cloud::speech::v2::AutoDetectDecodingConfig{};
         explicit_decoding_config->set_encoding(google::cloud::speech::v2::ExplicitDecodingConfig_AudioEncoding::ExplicitDecodingConfig_AudioEncoding_LINEAR16);
         explicit_decoding_config->set_sample_rate_hertz(8000);
         explicit_decoding_config->set_audio_channel_count(1);
         // cfg->clear_auto_decoding_config();
+
+        cfg->features().enable_automatic_punctuation();
     }
 
     // Start the RPC
@@ -69,7 +77,13 @@ int main(int argc, char* argv[]) {
         while (true) {
             auto resp = stream->Read().get();
             if (!resp.has_value()) break;  // stream closed
+
             for (auto const& result : resp->results()) {
+                if (result.is_final()){
+                  std::cout << "[Final] ";
+                }else{
+                  std::cout << "[Interim] ";
+                }
                 for (auto const& alt : result.alternatives()) {
                     std::cout << alt.transcript() << std::endl;
                 }
