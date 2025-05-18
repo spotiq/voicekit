@@ -48,8 +48,10 @@ int main(int argc, char* argv[]) {
         auto* cfg = config_req.mutable_streaming_config()->mutable_config();
         auto* explicit_decoding_config = cfg->mutable_explicit_decoding_config();
 
+        std::string projectID = "814354973424";
+        std::string recognizer = "projects/" + projectID + "/locations/global/recognizers/_";
         
-        config_req.mutable_recognizer()->append("projects/814354973424/locations/global/recognizers/_");
+        config_req.mutable_recognizer()->append(recognizer);
 
         cfg->add_language_codes("hi-IN");                       // Hindi
         cfg->set_model("latest_long");                          // long-form model
