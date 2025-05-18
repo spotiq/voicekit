@@ -9,6 +9,8 @@
 #include <google/cloud/project.h>
 #include <google/cloud/experimental_tag.h>
 #include <google/cloud/status_or.h>
+#include <google/cloud/status.h> // Make sure to include the Status header
+
 #include <memory>
 #include <string>
 #include <functional>

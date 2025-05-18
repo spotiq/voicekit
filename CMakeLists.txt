@@ -88,12 +88,8 @@ target_link_libraries(stt
     PRIVATE 
     pthread
     Microsoft.CognitiveServices.Speech.core
-    crypto
     ixwebsocket
-    z
-    ssl
     cpr
-    dl
     google-cloud-cpp::speech 
 )
 
@@ -117,5 +113,5 @@ install(TARGETS stt
 install(DIRECTORY include/ DESTINATION include)
 
 # Build Instructions
-message(STATUS "To build the library: mkdir -p build && cd build && cmake .. && make")
+message(STATUS "To build the library: cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/usr/local/src/vcpkg/scripts/buildsystems/vcpkg.cmake && cd build && make")
 message(STATUS "To run tests: cd build && ctest --verbose")
