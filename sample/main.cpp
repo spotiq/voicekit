@@ -1,6 +1,7 @@
 // main.cpp
 #include <google/cloud/speech/v2/speech_client.h>
 #include <google/cloud/status.h>
+#include <google/cloud/common_options.h>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -24,8 +25,15 @@ int main(int argc, char* argv[]) {
 
     std::string const filename = argv[1];
 
+    // Construct the endpoint for asia-south1 (Bengaluru) for Speech V2.
+    std::string endpoint = "asia-south1-speech.googleapis.com";
+
+    // Create options and set the endpoint.
+    google::cloud::Options options;
+    options.set<google::cloud::EndpointOption>(endpoint);
+
     // 1) Create the SpeechClient (uses GOOGLE_APPLICATION_CREDENTIALS)
-    auto client = speech::SpeechClient(speech::MakeSpeechConnection());
+    auto client = speech::SpeechClient(speech::MakeSpeechConnection(options));
 
     // 2) Launch streaming recognize
     auto stream = client.AsyncStreamingRecognize();
