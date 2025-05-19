@@ -19,7 +19,7 @@ int main() {
     // Voice selection (Hindi, India)
     auto* voice = request.mutable_voice();
     voice->set_language_code("hi-IN");
-    voice->set_name("hi-IN-Wavenet-A");  // Optional: pick specific voice
+    voice->set_name("hi-IN-Standard-A");  // Optional: pick specific voice
     voice->set_ssml_gender(google::cloud::texttospeech::v1::SsmlVoiceGender::FEMALE);
 
     // Audio config
@@ -52,19 +52,16 @@ int main() {
         continent, a new nation, conceived in Liberty, and dedicated to
         the proposition that all men are created equal.)""";
 
-        namespace texttospeech = ::google::cloud::texttospeech_v1;
-
-        auto client = texttospeech::TextToSpeechClient(
-        texttospeech::MakeTextToSpeechConnection());
-
         google::cloud::texttospeech::v1::SynthesisInput input;
         input.set_text(kText);
 
         google::cloud::texttospeech::v1::VoiceSelectionParams voice;
         voice.set_language_code("en-US");
+        voice.set_name("en-US-Chirp-HD-F");  // ✅ Specify voice name
 
         google::cloud::texttospeech::v1::AudioConfig audio;
         audio.set_audio_encoding(google::cloud::texttospeech::v1::LINEAR16);
+        audio.set_sample_rate_hertz(8000);  // 8kHz PCM
 
         auto response = client.SynthesizeSpeech(input, voice, audio);
         if (!response) throw std::move(response).status();
@@ -85,5 +82,6 @@ int main() {
         
         std::cout << "Audio content written to 'output_audio2.wav'\n";
     }
+    
     return 0;
 }

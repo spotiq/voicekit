@@ -9,9 +9,15 @@ find_package(google_cloud_cpp_texttospeech REQUIRED)
 
 add_executable(google_stt_stream main.cpp)
 add_executable(google_tts tts.cpp)
+add_executable(google_tts_stream tts-stream.cpp)
+
 
 target_link_libraries(google_stt_stream
   google-cloud-cpp::speech
+)
+
+target_link_libraries(google_tts_stream
+  google-cloud-cpp::texttospeech
 )
 
 target_link_libraries(google_tts
