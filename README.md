@@ -27,7 +27,7 @@ echo 'export PATH=$PATH:/usr/local/src/vcpkg' >> ~/.bashrc
 source ~/.bashrc
 
 # Install Google Cloud Speech SDK and dependencies
-./vcpkg/vcpkg install google-cloud-cpp[speech] --triplet x64-linux
+./vcpkg/vcpkg install google-cloud-cpp[speech,texttospeech] --triplet x64-linux
 
 # Install Protobuf (needed for gRPC and Google SDK)
 ./vcpkg/vcpkg install protobuf --triplet x64-linux
