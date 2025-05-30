@@ -55,10 +55,13 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(cpr)
 
 # === Download and build IXWebSocket ===
+# Enable TLS before building the library
+set(USE_TLS ON CACHE BOOL "Enable TLS support for ixwebsocket")
+
 FetchContent_Declare(
   ixwebsocket
   GIT_REPOSITORY https://github.com/machinezone/IXWebSocket.git
-  GIT_TAG master
+  GIT_TAG v11.4.6
 )
 
 FetchContent_MakeAvailable(ixwebsocket)
@@ -98,6 +101,8 @@ set(STT_SOURCES
     src/ElevenlabsTTS.cpp
     src/GoogleSTT.cpp
     src/AmazonTTS.cpp
+    src/TranscribeManager.cpp
+    src/AmazonSTT.cpp
 )
 
 # Create a static library

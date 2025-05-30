@@ -240,6 +240,56 @@ void TestGoogleSTT() {
     std::this_thread::sleep_for(std::chrono::seconds(20));
 }
 
+void TestAmazonSTT() {
+    const char* accessKeyEnv = std::getenv("AWS_ACCESS_KEY_ID");
+    const char* secretKeyEnv = std::getenv("AWS_SECRET_ACCESS_KEY");
+
+    if (!accessKeyEnv || !secretKeyEnv) {
+        std::cerr << "Error: AWS AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY credentials not found in environment variables." << std::endl;
+        return;
+    }
+
+    std::string credentials = std::string(accessKeyEnv) + ":" + std::string(secretKeyEnv);
+    std::string region = "ap-south-1";  // Correct AWS region for India (Mumbai)
+
+    std::shared_ptr<I_STTModule> stt = STTFactory::CreateSTTModule("Amazon", "test_session", [&](std::string& text) {
+        assert(!text.empty());
+        std::cout << "Test Recognized: " << text << "\n";
+        stt->StopRecognition();
+    }, "en-US");
+
+    std::cout << "InitialiseSTTModule" << "\n";
+
+    stt->InitialiseSTTModule(credentials, region);
+
+    std::cout << "StartRecognition" << "\n";
+
+    stt->StartRecognition();
+
+    std::cout << "audioFile " << "\n";
+
+    // This is hello world test with counting from 1 to 10. 1 2 3 4 5 6 7 8 9 10. 
+    std::ifstream audioFile("8KHz16BitMonoRawAudioSample.raw", std::ios::binary);
+    if (!audioFile) {
+        std::cerr << "Failed to open audio file.\n";
+        return;
+    }
+
+    std::vector<unsigned char> buffer(320);
+    while (audioFile.read(reinterpret_cast<char*>(buffer.data()), buffer.size())) {
+        stt->StreamAudioData(buffer);
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
+    
+    // Send remaining data if any
+    buffer.resize(audioFile.gcount());
+    if (!buffer.empty()) {
+        stt->StreamAudioData(buffer);
+    }
+
+    std::this_thread::sleep_for(std::chrono::seconds(20));
+}
+
 void TestElevenlabsTTS() {
     const char* key = std::getenv("ELEVENLABS_SPEECH_KEY");
     const char* region = std::getenv("SPEECH_REGION");
@@ -279,7 +329,8 @@ int main() {
     // TestDeepgramTTS();
     // TestElevenlabsTTS();
     // TestGoogleSTT();
-    TestAmazonTTS();
+    // TestAmazonTTS();
+    TestAmazonSTT();
     std::cout << "All tests passed!\n";
     return 0;
 }
