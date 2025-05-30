@@ -21,6 +21,25 @@ find_package(google_cloud_cpp_speech REQUIRED)
 # Set paths
 set(SPEECHSDK_ROOT "/usr/local/speechsdk")
 
+# === AWS C++ SDK (Polly Only) ===
+
+# Set common options
+set(BUILD_ONLY "polly" CACHE STRING "Build only Polly SDK" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build static libs" FORCE)
+set(ENABLE_TESTING OFF CACHE BOOL "Disable tests" FORCE)
+set(AWS_NATIVE_BUILD OFF CACHE BOOL "Disable native build" FORCE)
+set(ENABLE_UNITY_BUILD OFF CACHE BOOL "Disable unity build" FORCE)
+
+FetchContent_Declare(
+  aws-sdk-cpp
+  GIT_REPOSITORY https://github.com/aws/aws-sdk-cpp.git
+  GIT_TAG 1.11.578
+  GIT_SHALLOW TRUE
+  GIT_SUBMODULES_RECURSE TRUE
+)
+
+FetchContent_MakeAvailable(aws-sdk-cpp)
+
 # === Download and build cpr ===
 
 # Enable SSL support in CPR
@@ -78,6 +97,7 @@ set(STT_SOURCES
     src/DeepgramTTS.cpp
     src/ElevenlabsTTS.cpp
     src/GoogleSTT.cpp
+    src/AmazonTTS.cpp
 )
 
 # Create a static library
@@ -90,7 +110,9 @@ target_link_libraries(stt
     Microsoft.CognitiveServices.Speech.core
     ixwebsocket
     cpr
-    google-cloud-cpp::speech 
+    google-cloud-cpp::speech
+    aws-cpp-sdk-polly
+    aws-cpp-sdk-core
 )
 
 # Enable testing
