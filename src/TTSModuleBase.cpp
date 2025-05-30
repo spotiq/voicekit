@@ -18,7 +18,7 @@ std::vector<std::string> TTSModuleBase::splitText(const std::string& text) {
     }
 
     std::string temp;
-    const std::string delimiters = ".,!?"; // Use std::string instead of char array
+    const std::string delimiters = ".?"; // Use std::string instead of char array
     size_t length = text.length();
 
     for (size_t i = 0; i < length; ++i) {

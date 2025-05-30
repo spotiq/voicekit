@@ -96,7 +96,7 @@ void TestAmazonTTS() {
             outFile.write(reinterpret_cast<const char*>(audioData.data()), audioData.size());
             std::cout << "Audio data written to 8KHz16BitMonoRAWGeneratedAudio.raw" << "\n";
         }
-    }, "JOANNA");
+    }, "Joanna");
 
     tts->Initialise(key, region);
 

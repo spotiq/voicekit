@@ -78,6 +78,12 @@ std::string text = vk.transcribe("audio.wav");
 vk.synthesize(text, "output.wav");
 ```
 
+## AWS Configuration
+```bash
+export AWS_ACCESS_KEY_ID=your_access_key_id
+export AWS_SECRET_ACCESS_KEY=your_secret_access_key
+export AWS_DEFAULT_REGION=us-east-1
+```
 ## Contributing
 We welcome contributions from the community! Feel free to submit **issues, pull requests, and feature suggestions.**
 
