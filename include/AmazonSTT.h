@@ -24,7 +24,7 @@ private:
     std::string m_accessKey;
     std::string m_secretKey;
     std::string m_region;
-    ix::WebSocket webSocket;
+    ix::WebSocket m_webSocket;
     std::mutex wsMutex;
     bool isConnected = false;
     void handleMessage(const std::string& message);

@@ -255,7 +255,6 @@ void TestAmazonSTT() {
     std::shared_ptr<I_STTModule> stt = STTFactory::CreateSTTModule("Amazon", "test_session", [&](std::string& text) {
         assert(!text.empty());
         std::cout << "Test Recognized: " << text << "\n";
-        stt->StopRecognition();
     }, "en-US");
 
     std::cout << "InitialiseSTTModule" << "\n";
@@ -287,7 +286,8 @@ void TestAmazonSTT() {
         stt->StreamAudioData(buffer);
     }
 
-    std::this_thread::sleep_for(std::chrono::seconds(20));
+    stt->StopRecognition();
+    std::this_thread::sleep_for(std::chrono::seconds(5));
 }
 
 void TestElevenlabsTTS() {

@@ -20,8 +20,8 @@ void AmazonSTT::ImplStartRecognition() {
         return;
     }
 
-    webSocket.setUrl(url);
-    webSocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {
+    m_webSocket.setUrl(url);
+    m_webSocket.setOnMessageCallback([this](const ix::WebSocketMessagePtr& msg) {
         if (msg->type == ix::WebSocketMessageType::Message) {
             std::string payload;
             bool isError = false;
@@ -39,7 +39,7 @@ void AmazonSTT::ImplStartRecognition() {
         }
     });
 
-    webSocket.start();
+    m_webSocket.start();
 }
 
 void AmazonSTT::ImplStreamAudioData(std::vector<uint8_t> audioData) {
@@ -49,14 +49,24 @@ void AmazonSTT::ImplStreamAudioData(std::vector<uint8_t> audioData) {
             SPDLOG_ERROR("[{}] Failed to frame audio data using TranscribeManager::makeRequest", stream_sid);
             return;
         }
-        webSocket.sendBinary(requestPayload);
+        m_webSocket.sendBinary(requestPayload);
     }
 }
 
 void AmazonSTT::ImplStopRecognition() {
     std::lock_guard<std::mutex> lock(wsMutex);
     if (isConnected) {
-        webSocket.stop();
+        // Send final empty audio frame
+        std::vector<uint8_t> emptyAudio;
+        std::string finalRequest;
+        if (!TranscribeManager::makeRequest(finalRequest, emptyAudio)) {
+            SPDLOG_ERROR("[{}] Failed to frame final empty audio chunk via TranscribeManager::makeRequest", stream_sid);
+        } else {
+            m_webSocket.sendBinary(finalRequest);
+            SPDLOG_INFO("[{}] Sent final empty audio chunk to Amazon Transcribe", stream_sid);
+        }
+        // Close WebSocket connection
+        m_webSocket.stop();
         isConnected = false;
         SPDLOG_INFO("[{}] Amazon Transcribe WebSocket stopped", stream_sid);
     }
